@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"encoding/json"
@@ -7,15 +7,10 @@ import (
 	"net/http"
 
 	helper "github.com/emnopal/go_helper"
+	schemas "github.com/emnopal/simple_go_rest_api_service/pkg/schemas/json"
 )
 
-type server struct{}
-
-type ExampleJSON struct {
-	JSONBody string `json:"json_body,omitempty"`
-}
-
-func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func HelloWorld(w http.ResponseWriter, req *http.Request) {
 
 	headParams := &helper.HeaderParams{
 		AccessControlAllowMethods: "GET, POST",
@@ -27,7 +22,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	query_param := req.URL.Query().Get("query_param")
 
-	var t ExampleJSON
+	var t schemas.ExampleJSON
 	JSONBody := ""
 
 	if req.Method == "POST" {
@@ -58,12 +53,4 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(status)
 	w.Write([]byte(message))
 
-}
-
-func main() {
-	log.Println("Listing for requests at http://localhost:8000/")
-	PORTS := helper.GetENV("PORTS", ":8000")
-	serve := &server{}
-	http.HandleFunc("/", serve.ServeHTTP)
-	log.Fatal(http.ListenAndServe(PORTS, nil))
 }
