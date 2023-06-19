@@ -17,30 +17,26 @@ type ExampleJSON struct {
 
 func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	// to set which origin can access this rest api
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	// to set which methods is allowed to access this rest api
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
-
-	// to set which headers is allowed to access this rest api
-	w.Header().Set("Access-Control-Allow-Headers", "*")
-
-	// added headers
-	w.Header().Set("Content-Type", "application/json")
+	headParams := &helper.HeaderParams{
+		AccessControlAllowMethods: "GET, POST",
+	}
+	helper.SetHeader(w, headParams)
 
 	message := ""
 	status := http.StatusOK
 
 	query_param := req.URL.Query().Get("query_param")
 
+	var t ExampleJSON
 	JSONBody := ""
 
-	var t ExampleJSON
-	if err := json.NewDecoder(req.Body).Decode(&t); err != nil && req.Method == "POST" {
-		log.Print("WARNING! JSON is empty")
-	} else {
-		JSONBody = t.JSONBody
+	if req.Method == "POST" {
+		err := json.NewDecoder(req.Body).Decode(&t)
+		if err != nil {
+			log.Print("WARNING! JSON is empty")
+		} else {
+			JSONBody = t.JSONBody
+		}
 	}
 
 	switch req.Method {
